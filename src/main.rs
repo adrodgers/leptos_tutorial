@@ -19,28 +19,36 @@ fn App() -> impl IntoView {
             "Click me: "
             {move || count()}
         </button>
-        <progress
-            // static attributes work as in HTML
-            max="50"
-
-            // passing a function to an attribute
-            // reactively sets that attribute
-            // signals are functions, so this <=> `move || count.get()`
-            value=count
-        >
-        </progress>
-        <br/>
-
-        // This progress bar will use `double_count`
-        // so it should move twice as fast!
-        <progress
-            max="50"
-            // derived signals are functions, so they can also
-            // reactive update the DOM
-            value=double_count
-        >
-        </progress>
+        <ProgressBar max=50 progress=count/>
+        <ProgressBar progress=Signal::derive(double_count) max=50/>
         <p>"Count: " {count}</p>
         <p>"Double Count: " {double_count}</p>
+    }
+}
+
+// In leptos, define props by giving additional arguments to the
+// component function.
+// If you have a component property that will change over time
+// it should be a signal.
+// Props can be set as optional.
+// Props can be given a default value.
+
+/// Docs can be added easily, show progress towards a goal.
+#[component]
+fn ProgressBar(
+    /// How much progress should be displayed.
+    #[prop(into)]
+    progress: Signal<i32>,
+    /// Maximum value of the progress bar.
+    #[prop(optional)]
+    max: u16,
+) -> impl IntoView {
+    view! {
+        <p>
+        <progress
+            max=max
+            value=progress
+        />
+        </p>
     }
 }
